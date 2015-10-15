@@ -57,15 +57,13 @@ namespace dust
             }
         }
 
-    protected:
-        std::mt19937 gen;
-
     private:
         motion_model motion;
         uniform_state uniform;
         unsigned int num_particles;
         std::vector<State> particles;
         std::vector<std::pair<State, float>> sampled_particles;
+        std::mt19937 gen;
         std::uniform_real_distribution<float> resample_dist;
     };
 }
