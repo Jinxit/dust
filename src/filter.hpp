@@ -9,22 +9,20 @@ namespace dust
     class filter
     {
     public:
-        using motion_model = std::function<State(const State&, float)>;
-        using observation_probability = std::function<float(const Observation&,
-                                                            const State&)>;
+        using motion_model = std::function<std::pair<float, State>(const State&,
+                                                                   const Observation&,
+                                                                   float)>;
         using uniform_state = std::function<State()>;
 
-        filter(motion_model motion, observation_probability obs_prob,
-               uniform_state uniform, unsigned int num_particles)
+        filter(motion_model motion, uniform_state uniform, unsigned int num_particles)
             : motion(motion),
-              obs_prob(obs_prob),
               uniform(uniform),
               num_particles(num_particles),
               resample_dist(0, 1.0f / num_particles)
-            {
-                reset();
-                sampled_particles.resize(num_particles);
-            };
+        {
+            reset();
+            sampled_particles.resize(num_particles);
+        }
 
         void reset()
         {
@@ -40,9 +38,7 @@ namespace dust
             std::transform(particles.begin(), particles.end(),
                            std::back_inserter(sampled_particles),
                            [&](const State& particle) {
-                               auto x = motion(particle, dt);
-                               auto w = obs_prob(z, x);
-                               return std::make_pair(x, w);
+                               return motion(particle, z, dt);
                            });
 
             particles.clear();
@@ -61,14 +57,15 @@ namespace dust
             }
         }
 
+    protected:
+        std::mt19937 gen;
+
     private:
         motion_model motion;
-        observation_probability obs_prob;
         uniform_state uniform;
         unsigned int num_particles;
         std::vector<State> particles;
         std::vector<std::pair<State, float>> sampled_particles;
-        std::mt19937 gen;
         std::uniform_real_distribution<float> resample_dist;
     };
 }
