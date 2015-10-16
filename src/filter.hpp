@@ -21,6 +21,13 @@ namespace dust
             reset();
             sampled_particles.resize(num_particles);
         }
+        filter(unsigned int num_particles, const State& init)
+            : num_particles(num_particles),
+              resample_dist(0, 1.0f / num_particles),
+              particles(num_particles, init)
+        {
+            sampled_particles.resize(num_particles);
+        }
 
         void reset()
         {
