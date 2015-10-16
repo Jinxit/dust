@@ -49,7 +49,7 @@ namespace dust
 
             particles.clear();
             auto r = resample_dist(gen);
-            auto c = sampled_particles.front().second;
+            auto c = sampled_particles.front().first;
             unsigned int i = 0;
             for (unsigned int m = 0; m < num_particles; m++)
             {
@@ -57,9 +57,9 @@ namespace dust
                 while (U > c)
                 {
                     i++;
-                    c += sampled_particles[i].second;
+                    c += sampled_particles[i].first;
                 }
-                particles.push_back(sampled_particles[i].first);
+                particles.push_back(sampled_particles[i].second);
             }
         }
 
