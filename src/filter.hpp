@@ -14,10 +14,8 @@ namespace dust
                                                                    float)>;
         using uniform_state = std::function<State()>;
 
-        filter(motion_model motion, uniform_state uniform, unsigned int num_particles)
-            : motion(motion),
-              uniform(uniform),
-              num_particles(num_particles),
+        filter(unsigned int num_particles)
+            : num_particles(num_particles),
               resample_dist(0, 1.0f / num_particles)
         {
             reset();
@@ -28,7 +26,8 @@ namespace dust
         {
             particles.clear();
             particles.reserve(num_particles);
-            std::generate_n(std::back_inserter(particles), num_particles, uniform);
+            std::generate_n(std::back_inserter(particles), num_particles,
+                            [&]{ return uniform(); });
         }
 
         void update(const Observation& z, float dt)
@@ -57,13 +56,17 @@ namespace dust
             }
         }
 
+    protected:
+        virtual std::pair<float, State> motion(const State& state,
+                                               const Observation& obs,
+                                               float dt) const = 0;
+        virtual State uniform() const = 0;
+        mutable std::mt19937 gen;
+
     private:
-        motion_model motion;
-        uniform_state uniform;
         unsigned int num_particles;
         std::vector<State> particles;
         std::vector<std::pair<State, float>> sampled_particles;
-        std::mt19937 gen;
         std::uniform_real_distribution<float> resample_dist;
     };
 }
