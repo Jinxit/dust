@@ -61,6 +61,32 @@ namespace dust
                 }
                 particles.push_back(sampled_particles[i].second);
             }
+
+            largest_weight_dirty = true;
+        }
+
+        State& estimate_largest_weight()
+        {
+            if (largest_weight_dirty)
+            {
+                largest_weight_dirty = false;
+                float largest = 0;
+                for (auto& p : sampled_particles)
+                {
+                    if (p.first > largest)
+                    {
+                        largest = p.first;
+                        largest_weight = p.second;
+                    }
+                }
+            }
+
+            return largest_weight;
+        }
+
+        const std::vector<std::pair<float, State>>& get_sampled_particles() const
+        {
+            return sampled_particles;
         }
 
     protected:
@@ -73,7 +99,10 @@ namespace dust
     private:
         unsigned int num_particles;
         std::vector<State> particles;
-        std::vector<std::pair<State, float>> sampled_particles;
+        std::vector<std::pair<float, State>> sampled_particles;
         std::uniform_real_distribution<float> resample_dist;
+
+        bool largest_weight_dirty = true;
+        State largest_weight;
     };
 }
