@@ -10,8 +10,7 @@ namespace dust
     {
     public:
         using motion_model = std::function<std::pair<float, State>(const State&,
-                                                                   const Observation&,
-                                                                   float)>;
+                                                                   const Observation&)>;
         using uniform_state = std::function<State()>;
 
         filter(unsigned int num_particles)
@@ -37,14 +36,14 @@ namespace dust
                             [&]{ return uniform(); });
         }
 
-        void update(const Observation& z, float dt)
+        void update(const Observation& z)
         {
             sampled_particles.clear();
             sampled_particles.reserve(num_particles);
             std::transform(particles.begin(), particles.end(),
                            std::back_inserter(sampled_particles),
                            [&](const State& particle) {
-                               return motion(particle, z, dt);
+                               return motion(particle, z);
                            });
 
             particles.clear();
@@ -84,8 +83,7 @@ namespace dust
 
     protected:
         virtual std::pair<float, State> motion(const State& state,
-                                               const Observation& obs,
-                                               float dt) const = 0;
+                                               const Observation& obs) const = 0;
         virtual State uniform() const = 0;
         mutable std::mt19937 gen;
 
