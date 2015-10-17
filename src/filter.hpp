@@ -2,6 +2,7 @@
  
 #include <random>
 #include <functional>
+#include <algorithm>
 
 namespace dust
 {
