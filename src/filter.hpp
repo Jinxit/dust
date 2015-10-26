@@ -14,13 +14,6 @@ namespace dust
                                                                    const Observation&)>;
         using uniform_state = std::function<State()>;
 
-        filter(unsigned int num_particles)
-            : num_particles(num_particles),
-              resample_dist(0, 1.0f / num_particles)
-        {
-            reset();
-            sampled_particles.resize(num_particles);
-        }
         filter(unsigned int num_particles, const State& init)
             : num_particles(num_particles),
               resample_dist(0, 1.0f / num_particles),
@@ -75,6 +68,11 @@ namespace dust
             }
 
             return largest;
+        }
+
+        const std::vector<State>& get_particles() const
+        {
+            return particles;
         }
 
         const std::vector<std::pair<float, State>>& get_sampled_particles() const
